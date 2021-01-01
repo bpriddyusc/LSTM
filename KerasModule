@@ -1,11 +1,8 @@
 import numpy as np
-
 from scipy import signal
-import json
-    
+import json 
 from math import sin, cos, pi, floor
 import matplotlib.pyplot as plt
-
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM
 from tensorflow.keras.layers import Dense
@@ -20,28 +17,24 @@ model.compile(optimizer='adam', loss='mse')
 with open('DROPBEAR_dataset.json') as fp:
     data = json.load(fp)
 
-
 def getData(x):
     DataList = list()
     for i in data.get(x):
         i = str(i) 
-        DataList.append(i)
-        
+        DataList.append(i)      
     return DataList
-
-
+    
 X = getData("acceleration_data")
 Y = getData("measured_pin_location")
 
 
-DataList = list()
+DataList = list()                                                       #getting rid of the NAN values
 for i in range(len(Y)):
     if Y[i].replace('.', '', 1).lstrip('-').isdigit()== True:
         DataList.append(float(Y[i]))
         
     else:
         DataList.append(float(Y[i-1]))
-
 Y = np.array(DataList)
 
 
@@ -50,7 +43,7 @@ print("measured_pin_location:", len(Y))
 
 
 def resampled(x, L, M):
-    penis = list()
+    a = list()
     
     if L>=M:                        #upsampling
         b =int(len(x)*(L/M)+1)
@@ -58,9 +51,9 @@ def resampled(x, L, M):
         
     else:                            #downsampling
         b = int(len(x)/M + 1)
-        penis = signal.resample(x, b)
+        a = signal.resample(x, b)
 
-    return penis
+    return a
 
 
 X = resampled(X, 1, 8)
@@ -71,7 +64,7 @@ X = X[0:(smallest)]
 Y = Y[0:(smallest)]
 
 train_seq = Y
-
+                                                    #standarize the input values
 mu_x = np.mean(X)
 mu_y = np.mean(Y)
 sig_x = np.std(X)
@@ -90,7 +83,7 @@ Y_standardized = (Y - mu_y) / sig_y;
 
 
 Xlist, ylist = list(), list()
-n_steps= 200
+n_steps= 200                                            #properly formating the input values so it can be read by the Keras module
 for i in range(len(X_standardized)):
     
     endVariable= i + n_steps
@@ -135,7 +128,7 @@ plt.show()
 #calc_y = test_function(test_xaxis)
 # start with initial n values, rest will be predicted
 test_y = train_seq[:n_steps]
-
+                                                                #testing trained keras module
 
 for i in range( len(train_seq) - n_steps ):
     net_input = test_y[i : i + n_steps]
