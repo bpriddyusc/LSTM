@@ -47,7 +47,7 @@ def resampled(x, L, M):
     
     if L>=M:                        #upsampling
         b =int(len(x)*(L/M)+1)
-        penis = signal.resample(x, b)
+        a = signal.resample(x, b)
         
     else:                            #downsampling
         b = int(len(x)/M + 1)
